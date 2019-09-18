@@ -8,4 +8,4 @@ We patched Struts-1.1 as following:
 2. Upload file size limit
 3. Read property file as UTF-8 (get rid of native2ascii)
 
-See 1.1-da-patch.
+See [1.1-da-patch](https://github.com/dqbai/struts1/tree/1.1-da-patch).
