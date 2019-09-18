@@ -1240,7 +1240,9 @@ public class RequestUtils {
                 }
                 stripped = stripped.substring(0, stripped.length() - suffix.length());
             }
-            if (isMultipart) {
+            if (isAttack(stripped)) {
+                log.warn("received attack, skipped.");
+            } else if (isMultipart) {
                 properties.put(stripped, multipartParameters.get(name));
             } else {
                 properties.put(stripped, request.getParameterValues(name));
@@ -1254,6 +1256,23 @@ public class RequestUtils {
             throw new ServletException("BeanUtils.populate", e);
         }
 
+    }
+
+    private static final Pattern CVE_2014_0094 = Pattern.compile("(^|\\W)[cC]lass\\W");
+
+    /**
+     * Struts 脆弱性対応<br>
+     * 公式サイト: http://www.lac.co.jp/security/alert/2014/04/24_alert_01.html<br>
+     * 参照ページ: http://qiita.com/kawasima/items/670d2591bc8fea19dc1d<br>
+     *
+     * @param param
+     * @return
+     * @since 3.2.4
+     *
+     * @author Kensuke, Ishida
+     */
+    private static boolean isAttack(String param) {
+        return CVE_2014_0094.matcher(param).find();
     }
 
     /**
@@ -1362,20 +1381,20 @@ public class RequestUtils {
             HttpServletRequest request,
             MultipartRequestHandler multipartHandler) {
         Map parameters = new HashMap();
-        Enumeration enum;
+        Enumeration enm;
 
         Hashtable elements = multipartHandler.getAllElements();
-        enum = elements.keys();
-        while (enum.hasMoreElements()) {
-            String key = (String) enum.nextElement();
+        enm = elements.keys();
+        while (enm.hasMoreElements()) {
+            String key = (String) enm.nextElement();
             parameters.put(key, elements.get(key));
         }
 
         if (request instanceof MultipartRequestWrapper) {
             request = ((MultipartRequestWrapper)request).getRequest();
-            enum = request.getParameterNames();
-            while (enum.hasMoreElements()) {
-                String key = (String) enum.nextElement();
+            enm = request.getParameterNames();
+            while (enm.hasMoreElements()) {
+                String key = (String) enm.nextElement();
                 parameters.put(key, request.getParameterValues(key));
             }
         } else {
