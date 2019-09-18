@@ -216,7 +216,7 @@ public class CommonsMultipartRequestHandler implements MultipartRequestHandler {
         // Create and configure a DIskFileUpload instance.
         DiskFileUpload upload = new DiskFileUpload();
         // Set the maximum size before a FileUploadException will be thrown.
-        upload.setSizeMax((int) getSizeMax(ac));
+        upload.setSizeMax(getSizeMax(ac));
         // Set the maximum size that will be stored in memory.
         upload.setSizeThreshold((int) getSizeThreshold(ac));
         // Set the the location for saving data on disk.
@@ -542,8 +542,8 @@ public class CommonsMultipartRequestHandler implements MultipartRequestHandler {
          *
          * @return The size of the file, in bytes.
          */
-        public int getFileSize() {
-            return (int)fileItem.getSize();
+        public long getFileSize() {
+            return fileItem.getSize();
         }
 
 
@@ -554,7 +554,7 @@ public class CommonsMultipartRequestHandler implements MultipartRequestHandler {
          *
          * @param filesize The size of the file, in bytes.
          */
-        public void setFileSize(int filesize) {
+        public void setFileSize(long filesize) {
             throw new UnsupportedOperationException(
                     "The setFileSize() method is not supported.");
         }
