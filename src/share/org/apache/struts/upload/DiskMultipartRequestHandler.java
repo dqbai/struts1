@@ -180,7 +180,7 @@ public class DiskMultipartRequestHandler implements MultipartRequestHandler {
             DiskFile theFile = new DiskFile(tempFile.getAbsolutePath());
             theFile.setContentType(element.getContentType());
             theFile.setFileName(element.getFileName());
-            theFile.setFileSize((int) tempFile.length());
+            theFile.setFileSize(tempFile.length());
             fileElements.put(element.getName(), theFile);
             allElements.put(element.getName(), theFile);
         }
