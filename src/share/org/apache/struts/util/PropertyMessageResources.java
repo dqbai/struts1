@@ -4,10 +4,10 @@
  * $Date: 2003/04/19 19:06:02 $
  *
  * ====================================================================
- * 
+ *
  * The Apache Software License, Version 1.1
  *
- * Copyright (c) 1999-2003 The Apache Software Foundation.  All rights 
+ * Copyright (c) 1999-2003 The Apache Software Foundation.  All rights
  * reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -15,7 +15,7 @@
  * are met:
  *
  * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer. 
+ *    notice, this list of conditions and the following disclaimer.
  *
  * 2. Redistributions in binary form must reproduce the above copyright
  *    notice, this list of conditions and the following disclaimer in
@@ -23,15 +23,15 @@
  *    distribution.
  *
  * 3. The end-user documentation included with the redistribution, if
- *    any, must include the following acknowlegement:  
- *       "This product includes software developed by the 
+ *    any, must include the following acknowlegement:
+ *       "This product includes software developed by the
  *        Apache Software Foundation (http://www.apache.org/)."
  *    Alternately, this acknowlegement may appear in the software itself,
  *    if and wherever such third-party acknowlegements normally appear.
  *
  * 4. The names "The Jakarta Project", "Struts", and "Apache Software
  *    Foundation" must not be used to endorse or promote products derived
- *    from this software without prior written permission. For written 
+ *    from this software without prior written permission. For written
  *    permission, please contact apache@apache.org.
  *
  * 5. Products derived from this software may not be called "Apache"
@@ -57,7 +57,7 @@
  * information on the Apache Software Foundation, please see
  * <http://www.apache.org/>.
  *
- */ 
+ */
 
 
 package org.apache.struts.util;
@@ -268,7 +268,7 @@ public class PropertyMessageResources extends MessageResources {
         if (log.isTraceEnabled()) {
             log.trace("loadLocale(" + localeKey + ")");
         }
-        
+
         // Have we already attempted to load messages for this locale?
         if (locales.get(localeKey) != null) {
             return;
@@ -288,17 +288,18 @@ public class PropertyMessageResources extends MessageResources {
         if (log.isTraceEnabled()) {
             log.trace("  Loading resource '" + name + "'");
         }
-        
+
         ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
         if (classLoader == null) {
             classLoader = this.getClass().getClassLoader();
         }
-        
+
         is = classLoader.getResourceAsStream(name);
         if (is != null) {
             try {
-                props.load(is);
-                
+                // DA patch: get rid of native2ascii, 2019/09
+                props.load(new InputStreamReader(is, StandardCharsets.UTF_8));
+
             } catch (IOException e) {
                 log.error("loadLocale()", e);
             } finally {
@@ -309,7 +310,7 @@ public class PropertyMessageResources extends MessageResources {
                 }
             }
         }
-        
+
         if (log.isTraceEnabled()) {
             log.trace("  Loading resource completed");
         }
@@ -318,7 +319,7 @@ public class PropertyMessageResources extends MessageResources {
         if (props.size() < 1) {
             return;
         }
-        
+
         synchronized (messages) {
             Iterator names = props.keySet().iterator();
             while (names.hasNext()) {
