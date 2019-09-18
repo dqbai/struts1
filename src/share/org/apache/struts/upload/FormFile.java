@@ -94,14 +94,14 @@ public interface FormFile
      *
      * @return The size of the file, in bytes.
      */
-    public int getFileSize();
+    public long getFileSize();
     
     /**
      * Sets the file size.
      *
      * @param fileSize The size of the file, in bytes,
      */
-    public void setFileSize(int fileSize);    
+    public void setFileSize(long fileSize);    
     
     /**
      * Returns the file name of this file. This is the base name of the file,
