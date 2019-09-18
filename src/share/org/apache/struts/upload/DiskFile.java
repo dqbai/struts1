@@ -109,7 +109,13 @@ public class DiskFile implements FormFile {
      */    
     public byte[] getFileData() throws FileNotFoundException, IOException {
         
-        byte[] bytes = new byte[getFileSize()];
+        byte[] bytes = new byte[8];
+        long fileSizeValue = getFileSize();
+        int offset = 0;
+        for (int i = 0; i < 8; i++) {
+            offset = 64 - (i + 1) * 8;
+            bytes[i] = (byte) ((fileSizeValue >> offset) & 0xff);
+        }
         
         FileInputStream fis = new FileInputStream(filePath);
         fis.read(bytes);
