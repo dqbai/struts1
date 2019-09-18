@@ -10,4 +10,4 @@ We patched Struts-1.1 as following:
 
 The last patch breaks the compatibility against original Struts 1.1.
 
-2019/09/19   Bai Dongqiang
+2019/09/19
