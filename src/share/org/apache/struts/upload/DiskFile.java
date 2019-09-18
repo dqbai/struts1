@@ -83,7 +83,7 @@ public class DiskFile implements FormFile {
     /**
      * The size in bytes of the file
      */
-    protected int fileSize;
+    protected long fileSize;
     
     /**
      * The name of the file
@@ -197,7 +197,7 @@ public class DiskFile implements FormFile {
      * Set the file size
      * @param fileSize The size of the file in bytes
      */
-    public void setFileSize(int fileSize) {
+    public void setFileSize(long fileSize) {
         this.fileSize = fileSize;
     }
     
@@ -219,7 +219,7 @@ public class DiskFile implements FormFile {
      * Get the file size
      * @return The size of this file in bytes
      */
-    public int getFileSize() {
+    public long getFileSize() {
         return fileSize;
     }
     
