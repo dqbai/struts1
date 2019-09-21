@@ -285,10 +285,10 @@ public class ReloadableDefinitionsFactory implements ComponentDefinitionsFactory
       // This implementation is very simple.
       // It is possible to avoid creation of a new structure, but this would
       // imply writing all of the Map interface.
-    Enumeration enum = config.getInitParameterNames();
-    while( enum.hasMoreElements() )
+    Enumeration enm = config.getInitParameterNames();
+    while( enm.hasMoreElements() )
       {
-      String key = (String)enum.nextElement();
+      String key = (String)enm.nextElement();
       put( key, config.getInitParameter( key ) );
       }
     }

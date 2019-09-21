@@ -77,21 +77,21 @@ import java.util.NoSuchElementException;
  */
 
 public class IteratorAdapter implements Iterator {
-    private java.util.Enumeration enum;
+    private java.util.Enumeration enm;
 
-    public IteratorAdapter(java.util.Enumeration enum) {
-        this.enum = enum;
+    public IteratorAdapter(java.util.Enumeration enm) {
+        this.enm = enm;
     }
 
     public boolean hasNext() {
-        return enum.hasMoreElements();
+        return enm.hasMoreElements();
    }
 
     public Object next() {
-        if (!enum.hasMoreElements()) {
+        if (!enm.hasMoreElements()) {
             throw new NoSuchElementException("IteratorAdaptor.next() has no more elements");
         }
-        return enum.nextElement();
+        return enm.nextElement();
     }
     public void remove() {
         throw new java.lang.UnsupportedOperationException("Method IteratorAdaptor.remove() not implemented");
