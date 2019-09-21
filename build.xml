@@ -131,7 +131,7 @@
     <property name="compile.optimize" value="true" />
 
     <!-- Name of the core struts library -->
-    <property name="app.name" value="struts"/>
+    <property name="app.name" value="struts-1.1-da-patch-2"/>
 
     <!-- Name of the project -->
     <property name="project.name" value="jakarta-struts"/>
@@ -192,19 +192,21 @@
 
     <!-- Compilation Classpath -->
     <path id="compile.classpath">
-      <pathelement location="${commons-beanutils.jar}"/>
-      <pathelement location="${commons-collections.jar}"/>
-      <pathelement location="${struts-legacy.jar}"/>
-      <pathelement location="${commons-digester.jar}"/>
-      <pathelement location="${commons-fileupload.jar}"/>
-      <pathelement location="${commons-lang.jar}"/>
-      <pathelement location="${commons-logging.jar}"/>
-      <pathelement location="${commons-validator.jar}"/>
-      <pathelement location="${jakarta-oro.jar}"/>
-      <pathelement location="${jdbc20ext.jar}"/>
-      <pathelement location="${jsp.jar}"/>
-      <pathelement location="${servlet.jar}"/>
-      <pathelement location="${xerces.jar}"/>
+      <pathelement location="lib/commons-beanutils-1.6.1.jar"/>
+      <pathelement location="lib/commons-collections-3.1.jar"/>
+      <pathelement location="lib/struts-legacy-1.1.jar"/>
+      <pathelement location="lib/commons-digester-1.6.jar"/>
+      <pathelement location="lib/commons-fileupload-1.0.jar"/>
+      <pathelement location="lib/commons-lang-2.1.jar"/>
+      <pathelement location="lib/commons-logging-1.2.jar"/>
+      <pathelement location="lib/commons-validator-1.1.4.jar"/>
+      <pathelement location="lib/jakarta-oro-2.0.7.jar"/>
+      <pathelement location="lib/servlet-api-2.3.jar"/>
+    	<!--
+      <pathelement location="lib/jdbc20ext.jar"/>
+      <pathelement location="lib/jsp.jar"/>
+      <pathelement location="lib/xerces.jar"/>
+      -->
     </path>
 
 
@@ -243,6 +245,7 @@
         <copy todir="${build.home}/library/classes/org/apache/struts/resources">
             <fileset dir="${conf.share.dir}" includes="**/*.dtd"/>
         </copy>
+    	<!--
         <copy file="${commons-beanutils.jar}"
             tofile="${build.home}/library/commons-beanutils.jar"/>
         <copy file="${commons-collections.jar}"
@@ -261,6 +264,7 @@
             tofile="${build.home}/library/commons-validator.jar"/>
         <copy file="${jakarta-oro.jar}"
             tofile="${build.home}/library/jakarta-oro.jar"/>
+            -->
 <!-- Compile-time dependency only
         <copy file="${jdbc20ext.jar}"
             tofile="${build.home}/library/jdbc2_0-stdext.jar"/>
@@ -281,6 +285,8 @@
      description="Compile Struts library files">
         <javac srcdir="${src.share.dir}"
             destdir="${build.home}/library/classes"
+            source="1.7"
+            target="1.7"
             debug="${compile.debug}"
             optimize="${compile.optimize}"
             deprecation="${compile.deprecation}">
