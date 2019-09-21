@@ -278,7 +278,7 @@ public class PutTag extends BodyTagSupport {
    private TagSupport getAncestor(String className) 
                                  throws JspException {
 
-      Class klass = null; // can’t name variable "class"
+      Class klass = null; // can't name variable "class"
       try {
          klass = RequestUtils.applicationClass(className);
       }
