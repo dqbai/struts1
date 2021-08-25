@@ -66,10 +66,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Locale;
+import java.util.Map.Entry;
 import java.util.Properties;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -139,7 +139,7 @@ public class PropertyMessageResources extends MessageResources {
      * The set of locale keys for which we have already loaded messages, keyed
      * by the value calculated in <code>localeKey()</code>.
      */
-    protected HashMap locales = new HashMap();
+    protected ConcurrentHashMap<String, String> locales = new ConcurrentHashMap<>();
 
 
     /**
@@ -153,7 +153,7 @@ public class PropertyMessageResources extends MessageResources {
      * The cache of messages we have accumulated over time, keyed by the
      * value calculated in <code>messageKey()</code>.
      */
-    protected HashMap messages = new HashMap();
+    protected ConcurrentHashMap<String, String> messages = new ConcurrentHashMap<>();
 
 
     // --------------------------------------------------------- Public Methods
@@ -173,7 +173,7 @@ public class PropertyMessageResources extends MessageResources {
      * @param key The message key to look up
      * @return text message for the specified key and locale
      */
-    public String getMessage(Locale locale, String key) {
+    @Override public String getMessage(Locale locale, String key) {
 
         if (log.isDebugEnabled()) {
             log.debug("getMessage(" + locale + "," + key + ")");
@@ -195,14 +195,12 @@ public class PropertyMessageResources extends MessageResources {
 
             // Check if we have this key for the current locale key
             messageKey = messageKey(localeKey, key);
-            synchronized (messages) {
-                message = (String) messages.get(messageKey);
-                if (message != null) {
-                    if (addIt) {
-                        messages.put(originalKey, message);
-                    }
-                    return (message);
+            message = messages.get(messageKey);
+            if (message != null) {
+                if (addIt) {
+                    messages.putIfAbsent(originalKey, message);
                 }
+                return (message);
             }
 
             // Strip trailing modifiers to try a more general locale key
@@ -220,12 +218,10 @@ public class PropertyMessageResources extends MessageResources {
             localeKey = localeKey(defaultLocale);
             messageKey = messageKey(localeKey, key);
             loadLocale(localeKey);
-            synchronized (messages) {
-                message = (String) messages.get(messageKey);
-                if (message != null) {
-                    messages.put(originalKey, message);
-                    return (message);
-                }
+            message = messages.get(messageKey);
+            if (message != null) {
+                messages.putIfAbsent(originalKey, message);
+                return (message);
             }
         }
 
@@ -233,12 +229,10 @@ public class PropertyMessageResources extends MessageResources {
         localeKey = "";
         messageKey = messageKey(localeKey, key);
         loadLocale(localeKey);
-        synchronized (messages) {
-            message = (String) messages.get(messageKey);
-            if (message != null) {
-                messages.put(originalKey, message);
-                return (message);
-            }
+        message = messages.get(messageKey);
+        if (message != null) {
+            messages.putIfAbsent(originalKey, message);
+            return (message);
         }
 
         // Return an appropriate error indication
@@ -265,72 +259,75 @@ public class PropertyMessageResources extends MessageResources {
      *
      * @param localeKey Locale key for the messages to be retrieved
      */
-    protected synchronized void loadLocale(String localeKey) {
+    protected void loadLocale(String localeKey) {
 
         if (log.isTraceEnabled()) {
             log.trace("loadLocale(" + localeKey + ")");
         }
 
-        // Have we already attempted to load messages for this locale?
+        // Have we already loaded messages for this locale?
         if (locales.get(localeKey) != null) {
             return;
         }
-        locales.put(localeKey, localeKey);
 
-        // Set up to load the property resource for this locale key, if we can
-        String name = config.replace('.', '/');
-        if (localeKey.length() > 0) {
-            name += "_" + localeKey;
-        }
-        name += ".properties";
-        InputStream is = null;
-        Properties props = new Properties();
+        // DA patch: double check lock
+        synchronized (this) {
+            if (locales.get(localeKey) != null) {
+                return;
+            }
 
-        // Load the specified property resource
-        if (log.isTraceEnabled()) {
-            log.trace("  Loading resource '" + name + "'");
-        }
+            // Set up to load the property resource for this locale key, if we can
+            String name = config.replace('.', '/');
+            if (localeKey.length() > 0) {
+                name += "_" + localeKey;
+            }
+            name += ".properties";
+            InputStream is = null;
+            Properties props = new Properties();
 
-        ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
-        if (classLoader == null) {
-            classLoader = this.getClass().getClassLoader();
-        }
+            // Load the specified property resource
+            if (log.isTraceEnabled()) {
+                log.trace("  Loading resource '" + name + "'");
+            }
 
-        is = classLoader.getResourceAsStream(name);
-        if (is != null) {
-            try {
-                // DA patch: get rid of native2ascii, 2019/09
-                props.load(new InputStreamReader(is, StandardCharsets.UTF_8));
+            ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+            if (classLoader == null) {
+                classLoader = this.getClass().getClassLoader();
+            }
 
-            } catch (IOException e) {
-                log.error("loadLocale()", e);
-            } finally {
+            is = classLoader.getResourceAsStream(name);
+            if (is != null) {
                 try {
-                    is.close();
+                    // DA patch: get rid of native2ascii, 2019/09
+                    props.load(new InputStreamReader(is, StandardCharsets.UTF_8));
                 } catch (IOException e) {
                     log.error("loadLocale()", e);
+                } finally {
+                    try {
+                        is.close();
+                    } catch (IOException e) {
+                        log.error("loadLocale()", e);
+                    }
                 }
             }
-        }
 
-        if (log.isTraceEnabled()) {
-            log.trace("  Loading resource completed");
-        }
-
-        // Copy the corresponding values into our cache
-        if (props.size() < 1) {
-            return;
-        }
-
-        synchronized (messages) {
-            Iterator names = props.keySet().iterator();
-            while (names.hasNext()) {
-                String key = (String) names.next();
-                if (log.isTraceEnabled()) {
-                    log.trace("  Saving message key '" + messageKey(localeKey, key));
-                }
-                messages.put(messageKey(localeKey, key), props.getProperty(key));
+            if (log.isTraceEnabled()) {
+                log.trace("  Loading resource completed");
             }
+
+            // Copy the corresponding values into our cache
+            if (!props.isEmpty()) {
+                for (Entry<Object, Object> entry : props.entrySet()) {
+                    String key = (String) entry.getKey();
+                    if (log.isTraceEnabled()) {
+                        log.trace("  Saving message key '" + messageKey(localeKey, key));
+                    }
+                    messages.put(messageKey(localeKey, key), (String) entry.getValue());
+                }
+            }
+
+            // finished load messages, set the locale key as "already loaded" status
+            locales.put(localeKey, localeKey);
         }
 
     }
