@@ -19,5 +19,6 @@ We patched Struts-1.1 as following:
 2019/09/21
 
 - Decrease the wait lock via double lock check and ConcurrentHashMap to improve the performance.
+  Compile level = 11
 
 2021-08-26
