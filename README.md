@@ -17,3 +17,7 @@ We patched Struts-1.1 as following:
   by ant at Java 1.7 compile level, via jdk12.
 
 2019/09/21
+
+- Decrease the wait lock via double lock check and ConcurrentHashMap to improve the performance.
+
+2021-08-26
