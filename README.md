@@ -4,6 +4,7 @@ We have forked the tags/STRUTS\_1_1 as 1.1-da-patch branch.
 
 We patched Struts-1.1 as following:
 
+#### 2019/09/21
 - Vulnerability
 - OutOfMemory for huge upload files
 - Expanded upload file size limit from int to long
@@ -16,9 +17,8 @@ We patched Struts-1.1 as following:
 - You can find the source and binary jars under distrib directory. They are build
   by ant at Java 1.7 compile level, via jdk12.
 
-2019/09/21
 
+#### 2021-08-26
 - Decrease the wait lock via double lock check and ConcurrentHashMap to improve the performance.
   Compile level = 11
 
-2021-08-26
